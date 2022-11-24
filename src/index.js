@@ -1,36 +1,73 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
+import React, {useState, useEffect} from "react";
+import ReactDOM from "react-dom/client";
 
 const App = () => {
-  return (
-    <div>
-      <HookSwitcher />
-    </div>
-  )
+  const [value, setValue] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  if(visible) {
+    return (
+      <div>
+        <button
+          onClick={() => setValue((v) => v + 1)}>
+          +
+        </button>
+        <button
+          onClick={() => setVisible(false)}>
+          hide
+        </button>
+        <HookCounter value={value} />
+        <Notification />
+      </div>
+    )
+  } else {
+    return (
+      <button
+        onClick={() => setVisible(true)}>
+        show
+      </button>
+    )
+  }
 }
 
-const HookSwitcher = () => {
+const HookCounter = ({value}) => {
 
-  const [ color, setColor ] = useState('white');
-  const [ fontSize, setFontSize ] = useState(14);
+  useEffect(() => {
+    console.log('mount');
+    return () => {
+      console.log('unmount');
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('update');
+  });
+
+  return <p>{value}</p>
+}
+
+const Notification = () => {
+
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setVisible(false);
+    }, 2500);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
-    <div style={{
-      padding: '10px',
-      backgroundColor: color,
-      fontSize: `${fontSize}px`
-    }}>
-      <div>Hello World</div>
-      <button onClick={ () => setColor('gray') }>Dark</button>
-      <button onClick={ () => setColor('white') }>Light</button>
-      <button onClick={ () => setFontSize((prevState) => prevState + 2) }>+</button>
-    </div>
+      <div>
+        { visible && <p>Hello</p> }
+      </div>
   );
-};
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <App />
-  </React.StrictMode>
+  // </React.StrictMode>
 );
